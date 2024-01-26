@@ -1,19 +1,62 @@
-import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import React, { useState, useEffect, useRef } from 'react';
+import { Camera } from 'expo-camera';
 
 
 function CameraScreen() {
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+ 
+  useEffect(() => {
+     (async () => {
+       const { status } = await Camera.requestPermissionsAsync();
+       setHasCameraPermission(status === 'granted');
+     })();
+  }, []);
+ 
+  const takePicture = async () => {
+     if (camera) {
+       const data = await camera.takePictureAsync(null);
+       setImage(data.uri);
+     }
+  };
+ 
+  if (hasCameraPermission === null) {
+     return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasCameraPermission === false) {
+     return <Text>No access to camera</Text>;
+  }
   return (
-    <View style={styles.centered}>
-      <Text>Camera Screen</Text>
-    </View>
+     <View style={{ flex: 1 }}>
+       <Camera 
+         ref={ref => setCamera(ref)}
+         style={{ flex: 1 }}
+         type={type}
+       >
+         <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
+           <Button title="Flip Image" onPress={() => {
+             setType(
+               type === Camera.Constants.Type.back
+                 ? Camera.Constants.Type.front
+                 : Camera.Constants.Type.back
+             );
+           }} />
+           <Button title="Take Picture" onPress={takePicture} />
+         </View>
+       </Camera>
+       {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
+     </View>
   );
-}
+ }
+ 
+
 
 function GalleryScreen() {
   return (
