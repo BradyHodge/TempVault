@@ -12,28 +12,27 @@ function CameraScreen() {
   const [camera, setCamera] = useState(null);
   const [image, setImage] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
- 
+
   useEffect(() => {
-     (async () => {
-       const { status } = await Camera.requestCameraPermissionsAsync();
-       setHasCameraPermission(status === 'granted');
-     })();
+      (async () => {
+        const { status } = await Camera.requestCameraPermissionsAsync();
+        setHasCameraPermission(status === 'granted');
+      })();
   }, []);
- 
   const cameraRef = useRef(null);
 
- const takePicture = async () => {
+  const takePicture = async () => {
     if (cameraRef.current) {
       const data = await cameraRef.current.takePictureAsync(null);
       setImage(data.uri);
     }
- };
- 
+  };
+
   if (hasCameraPermission === null) {
-     return <Text>Requesting for camera permission</Text>;
+      return <Text>Requesting for camera permission</Text>;
   }
   if (hasCameraPermission === false) {
-     return <Text>No access to camera</Text>;
+      return <Text>No access to camera</Text>;
   }
   return (
     <View style={{ flex: 1 }}>
@@ -41,23 +40,23 @@ function CameraScreen() {
       ref={cameraRef}
       style={{ flex: 1 }}
       type={type}
-       >
-         <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
-           <Button title="Flip Image" onPress={() => {
-             setType(
-               type === Camera.Constants.Type.back
-                 ? Camera.Constants.Type.front
-                 : Camera.Constants.Type.back
-             );
-           }} />
-           <Button title="Take Picture" onPress={takePicture} />
-         </View>
-       </Camera>
-       {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
-     </View>
+        >
+          <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
+            <Button title="Flip Image" onPress={() => {
+            setType(
+                type === Camera.Constants.Type.back
+                  ? Camera.Constants.Type.front
+                  : Camera.Constants.Type.back
+              );
+            }} />
+            <Button title="Take Picture" onPress={takePicture} />
+          </View>
+        </Camera>
+        {image && <Image source={{ uri: image }} style={{ flex: 1 }} />}
+      </View>
   );
- }
- 
+}
+
 
 
 function GalleryScreen() {
