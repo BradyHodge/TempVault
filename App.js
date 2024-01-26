@@ -15,17 +15,19 @@ function CameraScreen() {
  
   useEffect(() => {
      (async () => {
-       const { status } = await Camera.requestPermissionsAsync();
+       const { status } = await Camera.requestCameraPermissionsAsync();
        setHasCameraPermission(status === 'granted');
      })();
   }, []);
  
-  const takePicture = async () => {
-     if (camera) {
-       const data = await camera.takePictureAsync(null);
-       setImage(data.uri);
-     }
-  };
+  const cameraRef = useRef(null);
+
+ const takePicture = async () => {
+    if (cameraRef.current) {
+      const data = await cameraRef.current.takePictureAsync(null);
+      setImage(data.uri);
+    }
+ };
  
   if (hasCameraPermission === null) {
      return <Text>Requesting for camera permission</Text>;
@@ -34,11 +36,11 @@ function CameraScreen() {
      return <Text>No access to camera</Text>;
   }
   return (
-     <View style={{ flex: 1 }}>
-       <Camera 
-         ref={ref => setCamera(ref)}
-         style={{ flex: 1 }}
-         type={type}
+    <View style={{ flex: 1 }}>
+    <Camera 
+      ref={cameraRef}
+      style={{ flex: 1 }}
+      type={type}
        >
          <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
            <Button title="Flip Image" onPress={() => {
